@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nossa Equipe — PataFeliz</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Estilo exclusivo da página da equipe ── */
+    :root {
+      --laranja: #FF7A00;
+      --laranja-claro: #FFF3E0;
+      --verde-pet: #4CAF50;
+      --roxo-pet: #7C3AED;
+      --azul-pet: #2196F3;
+      --rosa-pet: #E91E8C;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #FFF9F0 0%, #FFF3E0 50%, #F3E5F5 100%);
+      min-height: 100vh;
+    }
+
+    /* Cabeçalho da página */
+    .equipe-header {
+      background: linear-gradient(135deg, var(--laranja), #FF9800);
+      color: white;
+      padding: 3rem 0 4rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .equipe-header::before {
+      content: '🐾🐾🐾🐾🐾🐾🐾🐾🐾🐾';
+      position: absolute;
+      font-size: 3rem;
+      opacity: 0.08;
+      top: 10px; left: -20px;
+      letter-spacing: 10px;
+    }
+    .equipe-header h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+    }
+    .equipe-header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* Cards dos integrantes */
+    .membro-card {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-top: 5px solid var(--laranja);
+      height: 100%;
+    }
+    .membro-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 40px rgba(255,122,0,0.15);
+    }
+    .membro-card:nth-child(2) { border-top-color: var(--verde-pet); }
+    .membro-card:nth-child(3) { border-top-color: var(--roxo-pet); }
+    .membro-card:nth-child(4) { border-top-color: var(--azul-pet); }
+
+    /* Avatar do membro */
+    .membro-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      object-fit: cover;
+      border: 4px solid var(--laranja-claro);
+      font-size: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--laranja-claro);
+    }
+
+    .membro-avatar img{
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    /* Nome e papel do membro */
+    .membro-nome {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 0.25rem;
+    }
+    .membro-papel {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--laranja);
+      margin-bottom: 0.75rem;
+    }
+    .membro-email {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 1rem;
+    }
+    .membro-email a {
+      color: var(--laranja);
+      text-decoration: none;
+    }
+    .membro-bio {
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.6;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 1rem;
+      margin-top: 0.5rem;
+      text-align: left;
+    }
+
+    /* Seção de tecnologias */
+    .tech-section {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .tech-badge {
+      display: inline-block;
+      background: var(--laranja-claro);
+      color: var(--laranja);
+      border: 1px solid #FFE0B2;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 4px;
+    }
+
+    /* Rodapé */
+    .equipe-footer {
+      background: #1a1a1a;
+      color: #aaa;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+    }
+    .equipe-footer strong { color: var(--laranja); }
+
+    /* Botão de voltar */
+    .btn-voltar {
+      background: white;
+      color: var(--laranja);
+      border: 2px solid var(--laranja);
+      border-radius: 50px;
+      padding: 8px 24px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-voltar:hover {
+      background: var(--laranja);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabeçalho -->
+  <header class="equipe-header">
+    <div class="container">
+      <p class="mb-2" style="font-size:2rem;">👩‍💻👨‍💻</p>
+      <h1>Nossa Equipe</h1>
+      <p>As pessoas por trás do <strong>PataFeliz PetShop</strong></p>
+      <a href="/usuarios/listar" class="btn-voltar mt-3 d-inline-block">
+        <i class="bi bi-arrow-left me-1"></i>Voltar ao início
+      </a>
+    </div>
+  </header>
+
+  <!-- Cards dos integrantes -->
+  <main class="container py-5">
+    <div class="row g-4 justify-content-center">
+
+      <!-- ── Membro 1 ──────────────────────── -->
+      <div class="col-md-6 col-lg-3">
+        <div class="membro-card">
+          <div class="membro-avatar">
+            <img src="/static/imgs/avatar ingrid.png" alt="Foto Ingrid">
+          </div>
+
+          <div class="membro-nome">Ingrid Venancio</div>
+          <div class="membro-papel">Desenvolvedora</div>
+          <div class="membro-email">
+            <i class="bi bi-envelope me-1"></i>
+            <a href="mailto:ingrid.venancio@aluno.cps.sp.gov.br">ingrid.venancio@aluno.cps.sp.gov.br</a>
+          </div>
+          <p class="membro-bio">
+            Cursando Gestão da Tecnologia da Informação - 4º Semestre. Apaixonada por animais.
+            Nas horas vagas adora praticar esportes.
+            Tem três cachorros (Jolie, Paçoca e Xuxinha). 
+          </p>
+        </div>
+      </div>
+
+      <!-- ── Membro 2 ──────────────────────── -->
+    <div class="col-md-6 col-lg-3">
+          <div class="membro-card">
+            <div class="membro-avatar">
+              <img src="/static/imgs/avatar andre.png" alt="Foto Marquetto">
+            </div>
+
+          <div class="membro-nome">André Marquetto</div>
+          <div class="membro-papel" style="color:var(--azul-pet) ">Analista de Banco de dados</div>
+          <div class="membro-email">
+            <i class="bi bi-envelope me-1"></i>
+            <a href="mailto:andre.marquetto@aluno.cps.sp.gov.br">andre.marquetto@aluno.cps.sp.gov.br</a>
+          </div>
+          <p class="membro-bio">
+            Estudante de GTI na Fatec Jahu - 4º Semestre.<br>
+            Obcecado por jogos eletronicos principalmente CS2.
+            Tem um Gatão Frajola chamado Tom e uma gata femea chamada Luna. 
+          </p>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- Tecnologias utilizadas -->
+    <div class="tech-section mt-5">
+      <h4 class="text-center mb-4" style="font-family:'Fredoka',sans-serif; color:#1a1a1a;">
+        🛠️ Tecnologias Utilizadas
+      </h4>
+      <div class="text-center">
+        <span class="tech-badge">🐍 Python 3.12</span>
+        <span class="tech-badge">⚗️ Flask 3.0</span>
+        <span class="tech-badge">🎨 Bootstrap 5</span>
+        <span class="tech-badge">🌐 HTML5 + CSS3</span>
+        <span class="tech-badge">⚡ JavaScript E
