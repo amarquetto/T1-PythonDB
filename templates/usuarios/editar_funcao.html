@@ -1,78 +1,82 @@
 {% extends 'base.html' %}
-{% block titulo %}Nova Funcao — PataFeliz{% endblock %}
+{% block titulo %}Editar Funcao — PataFeliz{% endblock %}
 
 {% block conteudo %}
 
 <div class="mb-4">
   <h1 class="pagina-titulo mb-1">
-    <i class="bi bi-shield-lock-fill me-2 text-laranja"></i>Cadastrar Funcao
+    <i class="bi bi-shield-lock-fill me-2 text-laranja"></i>Editar Funcao
   </h1>
-  <p class="text-muted small mb-0">Crie uma funcao com permissoes especificas de acesso ao sistema</p>
+  <p class="text-muted small mb-0">Altere os dados da funcao abaixo</p>
 </div>
 
 <div class="row">
   <div class="col-lg-8">
     <div class="card shadow-sm border-0 card-faixa-laranja">
       <div class="card-body p-4">
-        <form method="POST" action="{{ url_for('inserir_funcao') }}" novalidate>
+
+        <form method="POST" action="{{ url_for('editar_funcao', id_funcao=funcao.id_funcao) }}" novalidate>
 
           <div class="mb-3">
             <label for="nome_funcao" class="form-label">Nome da funcao <span class="texto-obrigatorio">*</span></label>
             <input type="text" class="form-control" id="nome_funcao" name="nome_funcao"
-                   placeholder="Ex.: Recepcao, Estagiario, Gerente..." required maxlength="120" />
+                   value="{{ funcao.nome_funcao }}" required maxlength="120" />
           </div>
 
           <div class="mb-3">
             <label for="status_funcao" class="form-label">Status <span class="texto-obrigatorio">*</span></label>
             <select class="form-select" id="status_funcao" name="status_funcao" required>
-              <option value="" disabled selected>Selecione...</option>
-              <option value="ativo">Ativo</option>
-              <option value="inativo">Inativo</option>
+              <option value="ativo" {% if funcao.status == 'ativo' %}selected{% endif %}>Ativo</option>
+              <option value="inativo" {% if funcao.status == 'inativo' %}selected{% endif %}>Inativo</option>
             </select>
           </div>
 
           <div class="mb-3">
             <label for="descricao_funcao" class="form-label">Descricao</label>
             <textarea class="form-control" id="descricao_funcao" name="descricao_funcao"
-                      rows="3" placeholder="Descreva as responsabilidades desta funcao..."
-                      maxlength="500"></textarea>
+                      rows="3" maxlength="500">{{ funcao.descricao }}</textarea>
           </div>
 
           <div class="mb-4">
             <span class="form-label d-block mb-2">Permissoes de acesso</span>
-            <div class="list-group list-group-flush border rounded overflow-hidden shadow-sm list-group-borda-laranja">
+            <div class="list-group list-group-flush border rounded overflow-hidden shadow-sm">
 
               <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3 mb-0">
-                <input class="form-check-input mt-0" type="checkbox" name="permissoes" value="dashboard" />
+                <input class="form-check-input mt-0" type="checkbox" name="permissoes"
+                       value="dashboard" {% if funcao.perm_dashboard %}checked{% endif %} />
                 <span><i class="bi bi-speedometer2 text-laranja me-2"></i>Dashboard</span>
               </label>
 
               <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3 mb-0">
-                <input class="form-check-input mt-0" type="checkbox" name="permissoes" value="usuarios" />
+                <input class="form-check-input mt-0" type="checkbox" name="permissoes"
+                       value="usuarios" {% if funcao.perm_usuarios %}checked{% endif %} />
                 <span><i class="bi bi-people text-laranja me-2"></i>Gerenciar usuarios</span>
               </label>
 
               <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3 mb-0">
-                <input class="form-check-input mt-0" type="checkbox" name="permissoes" value="funcoes" />
+                <input class="form-check-input mt-0" type="checkbox" name="permissoes"
+                       value="funcoes" {% if funcao.perm_funcoes %}checked{% endif %} />
                 <span><i class="bi bi-shield-check text-laranja me-2"></i>Gerenciar funcoes</span>
               </label>
 
               <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3 mb-0">
-                <input class="form-check-input mt-0" type="checkbox" name="permissoes" value="pets" />
+                <input class="form-check-input mt-0" type="checkbox" name="permissoes"
+                       value="pets" {% if funcao.perm_pets %}checked{% endif %} />
                 <span><i class="bi bi-heart text-laranja me-2"></i>Gerenciar pets</span>
               </label>
 
               <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3 mb-0">
-                <input class="form-check-input mt-0" type="checkbox" name="permissoes" value="servicos" />
+                <input class="form-check-input mt-0" type="checkbox" name="permissoes"
+                       value="servicos" {% if funcao.perm_servicos %}checked{% endif %} />
                 <span><i class="bi bi-tools text-laranja me-2"></i>Gerenciar servicos</span>
               </label>
 
             </div>
           </div>
 
-          <div class="d-flex flex-wrap gap-2">
+          <div class="d-flex gap-2">
             <button type="submit" class="btn btn-laranja px-4">
-              <i class="bi bi-check-lg me-1"></i>Salvar funcao
+              <i class="bi bi-check-lg me-1"></i>Salvar
             </button>
             <a href="{{ url_for('listar_funcoes') }}" class="btn btn-outline-secondary px-4">
               <i class="bi bi-x-lg me-1"></i>Cancelar
