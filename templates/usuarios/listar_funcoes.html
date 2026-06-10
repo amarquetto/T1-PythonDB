@@ -31,6 +31,7 @@
             <th scope="col"><i class="bi bi-toggle2-on me-1"></i>Status</th>
             <th scope="col"><i class="bi bi-card-text me-1"></i>Descrição</th>
             <th scope="col"><i class="bi bi-ui-checks me-1"></i>Permissões</th>
+            <th scope="col" class="text-center">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -60,11 +61,25 @@
               <span class="text-muted">Nenhuma selecionada</span>
               {% endif %}
             </td>
+            <td class="text-center">
+              <a href="{{ url_for('editar_funcao', funcao_id=fn.id) }}"
+                 class="btn btn-sm btn-outline-primary me-1"
+                 title="Editar função">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="POST" action="{{ url_for('excluir_funcao', funcao_id=fn.id) }}"
+                    style="display:inline;"
+                    onsubmit="return confirm('Excluir a função \"{{ fn.nome }}\"? Esta ação não pode ser desfeita.')">
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir função">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </td>
           </tr>
           {% endfor %}
           {% else %}
           <tr>
-            <td colspan="5" class="text-center text-muted py-4">
+            <td colspan="6" class="text-center text-muted py-4">
               Nenhuma função cadastrada ainda. Use <strong>Cadastrar função</strong> para criar a primeira.
             </td>
           </tr>

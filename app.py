@@ -209,6 +209,107 @@ def cadastrar_funcoes():
     )
 
 
+@app.route('/usuarios/excluir-funcao/<int:funcao_id>', methods=['POST'])
+@login_required
+def excluir_funcao(funcao_id):
+    """Remove uma função cadastrada pelo ID."""
+    global funcoes
+    funcao = next((f for f in funcoes if f['id'] == funcao_id), None)
+    if funcao:
+        funcoes = [f for f in funcoes if f['id'] != funcao_id]
+        flash(f'Função "{funcao["nome"]}" excluída com sucesso!', 'success')
+    else:
+        flash('Função não encontrada.', 'danger')
+    return redirect(url_for('listar_funcoes'))
+
+
+@app.route('/usuarios/editar-funcao/<int:funcao_id>', methods=['GET', 'POST'])
+@login_required
+def editar_funcao(funcao_id):
+    """
+    GET  → exibe o formulário preenchido com os dados da função.
+    POST → valida e atualiza a função em memória.
+    """
+    funcao = next((f for f in funcoes if f['id'] == funcao_id), None)
+    if not funcao:
+        flash('Função não encontrada.', 'danger')
+        return redirect(url_for('listar_funcoes'))
+
+    if request.method == 'POST':
+        nome_funcao = request.form.get('nome_funcao', '').strip()
+        status      = request.form.get('status_funcao', '').strip()
+        descricao   = request.form.get('descricao_funcao', '').strip()
+        permissoes  = request.form.getlist('permissoes')
+
+        if not nome_funcao:
+            flash('Informe o nome da função.', 'danger')
+        elif len(nome_funcao) > 120:
+            flash('O nome da função pode ter no máximo 120 caracteres.', 'danger')
+        elif status not in ('ativo', 'inativo'):
+            flash('Selecione se a função ficará ativa ou inativa.', 'danger')
+        elif not descricao:
+            flash('Informe a descrição com as responsabilidades da função.', 'danger')
+        else:
+            chaves_validas = {p['key'] for p in PERMISSOES_CATALOGO}
+            funcao['nome']      = nome_funcao
+            funcao['status']    = status
+            funcao['descricao'] = descricao
+            funcao['permissoes'] = [k for k in permissoes if k in chaves_validas]
+            flash(f'Função "{nome_funcao}" atualizada com sucesso!', 'success')
+            return redirect(url_for('listar_funcoes'))
+
+    return render_template(
+        'usuarios/editar_funcao.html',
+        funcao=funcao,
+        permissoes_catalogo=PERMISSOES_CATALOGO,
+    )
+
+
+@app.route('/usuarios/excluir/<int:usuario_id>', methods=['POST'])
+@login_required
+def excluir_usuario(usuario_id):
+    """Remove um usuário pelo ID."""
+    global usuarios
+    usuario = next((u for u in usuarios if u['id'] == usuario_id), None)
+    if usuario:
+        usuarios = [u for u in usuarios if u['id'] != usuario_id]
+        flash(f'Usuário "{usuario["nome"]}" excluído com sucesso!', 'success')
+    else:
+        flash('Usuário não encontrado.', 'danger')
+    return redirect(url_for('listar_usuarios'))
+
+
+@app.route('/usuarios/editar/<int:usuario_id>', methods=['GET', 'POST'])
+@login_required
+def editar_usuario(usuario_id):
+    """
+    GET  → exibe o formulário preenchido com os dados do usuário.
+    POST → valida e atualiza o usuário em memória.
+    """
+    usuario = next((u for u in usuarios if u['id'] == usuario_id), None)
+    if not usuario:
+        flash('Usuário não encontrado.', 'danger')
+        return redirect(url_for('listar_usuarios'))
+
+    if request.method == 'POST':
+        nome   = request.form.get('nome', '').strip()
+        email  = request.form.get('email', '').strip()
+        perfil = request.form.get('perfil', '').strip()
+        ativo  = request.form.get('ativo', '').strip()
+
+        if not nome or not email or not perfil:
+            flash('Preencha todos os campos obrigatórios.', 'danger')
+        else:
+            usuario['nome']   = nome
+            usuario['email']  = email
+            usuario['perfil'] = perfil
+            usuario['ativo']  = ativo if ativo in ('Sim', 'Não') else 'Sim'
+            flash(f'Usuário "{nome}" atualizado com sucesso!', 'success')
+            return redirect(url_for('listar_usuarios'))
+
+    return render_template('usuarios/editar_usuario.html', usuario=usuario)
+
+
 @app.route('/usuarios/inserir', methods=['GET', 'POST'])
 @login_required
 def inserir_usuario():

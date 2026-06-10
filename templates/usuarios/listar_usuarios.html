@@ -62,15 +62,18 @@
               {% endif %}
             </td>
             <td class="text-center">
-              
-              <button class="btn btn-sm btn-outline-primary me-1" title="Editar usuário">
+              <a href="{{ url_for('editar_usuario', usuario_id=u.id) }}"
+                 class="btn btn-sm btn-outline-primary me-1"
+                 title="Editar usuário">
                 <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger"
-                      onclick="confirmarExclusao('{{ u.nome }}')"
-                      title="Excluir usuário">
-                <i class="bi bi-trash"></i>
-              </button>
+              </a>
+              <form method="POST" action="{{ url_for('excluir_usuario', usuario_id=u.id) }}"
+                    style="display:inline;"
+                    onsubmit="return confirm('Excluir o usuário \"{{ u.nome }}\"? Esta ação não pode ser desfeita.')">
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir usuário">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
             </td>
           </tr>
           {% endfor %}
