@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
-{% block titulo %}Funções cadastradas — PataFeliz{% endblock %}
+{% block titulo %}Funcoes — PataFeliz{% endblock %}
 
 {% block conteudo %}
 
-<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4">
   <div>
     <h1 class="pagina-titulo mb-1">
-      <i class="bi bi-list-check me-2 text-laranja"></i>Funções cadastradas
+      <i class="bi bi-shield-check me-2 text-laranja"></i>Funcoes Cadastradas
     </h1>
-    <p class="text-muted small mb-0">Visualize as funções do sistema, status e permissões de menu.</p>
+    <p class="text-muted small mb-0">Gerencie as funcoes e permissoes do sistema</p>
   </div>
-  <div class="d-flex flex-wrap gap-2">
-    <a href="{{ url_for('listar_usuarios') }}" class="btn btn-outline-secondary">
-      <i class="bi bi-people me-1"></i>Usuários
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('inserir_funcao') }}" class="btn btn-laranja">
+      <i class="bi bi-plus-lg me-1"></i>Nova Funcao
     </a>
-    <a href="{{ url_for('cadastrar_funcoes') }}" class="btn btn-laranja">
-      <i class="bi bi-plus-lg me-1"></i>Cadastrar função
+    <a href="{{ url_for('listar_usuarios') }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Voltar
     </a>
   </div>
 </div>
@@ -26,70 +26,55 @@
       <table class="table table-hover table-bordered align-middle mb-0">
         <thead class="thead-laranja">
           <tr>
-            <th scope="col">#</th>
-            <th scope="col"><i class="bi bi-shield me-1"></i>Função</th>
-            <th scope="col"><i class="bi bi-toggle2-on me-1"></i>Status</th>
-            <th scope="col"><i class="bi bi-card-text me-1"></i>Descrição</th>
-            <th scope="col"><i class="bi bi-ui-checks me-1"></i>Permissões</th>
-            <th scope="col" class="text-center">Ações</th>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Status</th>
+            <th>Descricao</th>
+            <th>Permissoes</th>
+            <th class="text-center">Acoes</th>
           </tr>
         </thead>
         <tbody>
-          {% if funcoes %}
-          {% for fn in funcoes %}
+          {% for f in funcoes %}
           <tr>
-            <td class="text-muted small">{{ fn.id }}</td>
-            <td><strong>{{ fn.nome }}</strong></td>
+            <td class="text-muted small">{{ f.id_funcao }}</td>
+            <td><strong>{{ f.nome_funcao }}</strong></td>
             <td>
-              {% if fn.status == 'ativo' %}
-              <span class="badge bg-success">Ativo</span>
+              {% if f.status == 'ativo' %}
+                <span class="badge bg-success">Ativo</span>
               {% else %}
-              <span class="badge bg-secondary">Inativo</span>
+                <span class="badge bg-secondary">Inativo</span>
               {% endif %}
             </td>
-            <td class="small">{{ fn.descricao }}</td>
-            <td class="small">
-              {% if fn.permissoes %}
-                {% for key in fn.permissoes %}
-                  {% for c in permissoes_catalogo %}
-                    {% if c.key == key %}
-                    <span class="badge bg-light text-dark border me-1 mb-1">{{ c.label }}</span>
-                    {% endif %}
-                  {% endfor %}
-                {% endfor %}
-              {% else %}
-              <span class="text-muted">Nenhuma selecionada</span>
-              {% endif %}
+            <td>{{ f.descricao or '—' }}</td>
+            <td>
+              {% if f.perm_dashboard %}<span class="badge bg-light text-dark border me-1">Dashboard</span>{% endif %}
+              {% if f.perm_usuarios %}<span class="badge bg-light text-dark border me-1">Usuarios</span>{% endif %}
+              {% if f.perm_funcoes %}<span class="badge bg-light text-dark border me-1">Funcoes</span>{% endif %}
+              {% if f.perm_pets %}<span class="badge bg-light text-dark border me-1">Pets</span>{% endif %}
+              {% if f.perm_servicos %}<span class="badge bg-light text-dark border me-1">Servicos</span>{% endif %}
             </td>
             <td class="text-center">
-              <a href="{{ url_for('editar_funcao', funcao_id=fn.id) }}"
-                 class="btn btn-sm btn-outline-primary me-1"
-                 title="Editar função">
+              <a href="{{ url_for('editar_funcao', id_funcao=f.id_funcao) }}"
+                 class="btn btn-sm btn-outline-primary me-1" title="Editar">
                 <i class="bi bi-pencil"></i>
               </a>
-              <form method="POST" action="{{ url_for('excluir_funcao', funcao_id=fn.id) }}"
-                    style="display:inline;"
-                    onsubmit="return confirm('Excluir a função \"{{ fn.nome }}\"? Esta ação não pode ser desfeita.')">
-                <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir função">
+              <form method="POST" action="{{ url_for('excluir_funcao', id_funcao=f.id_funcao) }}"
+                    style="display:inline"
+                    onsubmit="return confirm('Excluir a funcao {{ f.nome_funcao }}?')">
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir">
                   <i class="bi bi-trash"></i>
                 </button>
               </form>
             </td>
           </tr>
           {% endfor %}
-          {% else %}
-          <tr>
-            <td colspan="6" class="text-center text-muted py-4">
-              Nenhuma função cadastrada ainda. Use <strong>Cadastrar função</strong> para criar a primeira.
-            </td>
-          </tr>
-          {% endif %}
         </tbody>
       </table>
     </div>
   </div>
-  <div class="card-footer text-muted small card-footer-faixa-laranja">
-    Total de funções: <strong>{{ funcoes|length }}</strong>
+  <div class="card-footer text-muted small">
+    Total de funcoes: <strong>{{ funcoes|length }}</strong>
   </div>
 </div>
 

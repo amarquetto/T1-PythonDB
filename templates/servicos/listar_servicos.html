@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
-{% block titulo %}Serviços — PataFeliz{% endblock %}
+{% block titulo %}Servicos — PataFeliz{% endblock %}
 
 {% block conteudo %}
 
 <div class="d-flex justify-content-between align-items-center mb-4">
   <div>
     <h1 class="pagina-titulo mb-1">
-      <i class="bi bi-scissors me-2 text-laranja"></i>Serviços Oferecidos
+      <i class="bi bi-scissors me-2 text-laranja"></i>Servicos Oferecidos
     </h1>
-    <p class="text-muted small mb-0">Gerencie o catálogo de serviços do PataFeliz</p>
+    <p class="text-muted small mb-0">Gerencie o catalogo de servicos do PataFeliz</p>
   </div>
   <a href="{{ url_for('inserir_servico') }}" class="btn btn-laranja">
-    <i class="bi bi-plus-lg me-1"></i>Novo Serviço
+    <i class="bi bi-plus-lg me-1"></i>Novo Servico
   </a>
 </div>
 
@@ -22,51 +22,53 @@
         <thead class="thead-laranja">
           <tr>
             <th>#</th>
-            <th><i class="bi bi-tag me-1"></i>Serviço</th>
+            <th>Servico</th>
             <th>Categoria</th>
-            <th><i class="bi bi-currency-dollar me-1"></i>Preço</th>
-            <th><i class="bi bi-clock me-1"></i>Duração</th>
-            <th>Disponível</th>
-            <th class="text-center">Ações</th>
+            <th>Preco</th>
+            <th>Duracao</th>
+            <th>Disponivel</th>
+            <th class="text-center">Acoes</th>
           </tr>
         </thead>
         <tbody>
           {% for s in servicos %}
           <tr>
-            <td class="text-muted small">{{ s.id }}</td>
+            <td class="text-muted small">{{ s.id_servico }}</td>
             <td><strong>{{ s.nome }}</strong></td>
             <td>
-              <!-- Cor do badge de acordo com a categoria -->
-              {% if s.categoria == 'Saúde' %}
+              {% if s.categoria == 'Saude' %}
                 <span class="badge bg-danger">{{ s.categoria }}</span>
-              {% elif s.categoria == 'Estética' %}
-                <span class="badge bg-pink">{{ s.categoria }}</span>
+              {% elif s.categoria == 'Estetica' %}
+                <span class="badge bg-warning text-dark">{{ s.categoria }}</span>
               {% elif s.categoria == 'Hospedagem' %}
                 <span class="badge bg-primary">{{ s.categoria }}</span>
               {% elif s.categoria == 'Treinamento' %}
-                <span class="badge bg-warning text-dark">{{ s.categoria }}</span>
+                <span class="badge bg-info text-dark">{{ s.categoria }}</span>
               {% else %}
                 <span class="badge bg-secondary">{{ s.categoria }}</span>
               {% endif %}
             </td>
-            <td class="fw-semibold text-laranja">{{ s.preco }}</td>
+            <td class="fw-semibold text-laranja">R$ {{ "%.2f"|format(s.preco|float) }}</td>
             <td>{{ s.duracao }}</td>
             <td>
               {% if s.disponivel == 'Sim' %}
-                <span class="badge bg-success">Disponível</span>
+                <span class="badge bg-success">Disponivel</span>
               {% else %}
-                <span class="badge bg-secondary">Indisponível</span>
+                <span class="badge bg-secondary">Indisponivel</span>
               {% endif %}
             </td>
             <td class="text-center">
-              <button class="btn btn-sm btn-outline-primary me-1" title="Editar serviço">
+              <a href="{{ url_for('editar_servico', id_servico=s.id_servico) }}"
+                 class="btn btn-sm btn-outline-primary me-1" title="Editar">
                 <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger"
-                      onclick="confirmarExclusao('{{ s.nome }}')"
-                      title="Excluir serviço">
-                <i class="bi bi-trash"></i>
-              </button>
+              </a>
+              <form method="POST" action="{{ url_for('excluir_servico', id_servico=s.id_servico) }}"
+                    style="display:inline"
+                    onsubmit="return confirm('Excluir o servico {{ s.nome }}?')">
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
             </td>
           </tr>
           {% endfor %}
@@ -75,7 +77,7 @@
     </div>
   </div>
   <div class="card-footer text-muted small">
-    Total de serviços: <strong>{{ servicos|length }}</strong>
+    Total de servicos: <strong>{{ servicos|length }}</strong>
   </div>
 </div>
 

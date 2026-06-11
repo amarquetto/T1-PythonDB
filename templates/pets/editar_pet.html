@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block titulo %}Editar Pet — PataFeliz{% endblock %}
+
+{% block conteudo %}
+
+<div class="mb-4">
+  <h1 class="pagina-titulo mb-1">
+    <i class="bi bi-heart-fill me-2 text-laranja"></i>Editar Pet
+  </h1>
+  <p class="text-muted small mb-0">Altere os dados do pet abaixo</p>
+</div>
+
+<div class="row">
+  <div class="col-md-8 col-lg-7">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+
+        <form method="POST" action="{{ url_for('editar_pet', id_pet=pet.id_pet) }}" novalidate>
+
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label for="nome" class="form-label">Nome do pet <span class="texto-obrigatorio">*</span></label>
+              <input type="text" class="form-control" id="nome" name="nome"
+                     value="{{ pet.nome }}" required maxlength="100" />
+            </div>
+
+            <div class="col-md-6">
+              <label for="especie" class="form-label">Especie <span class="texto-obrigatorio">*</span></label>
+              <select class="form-select" id="especie" name="especie" required>
+                <option value="">Selecione...</option>
+                <option value="Cao" {% if pet.especie == 'Cao' %}selected{% endif %}>Cao</option>
+                <option value="Gato" {% if pet.especie == 'Gato' %}selected{% endif %}>Gato</option>
+                <option value="Coelho" {% if pet.especie == 'Coelho' %}selected{% endif %}>Coelho</option>
+                <option value="Passaro" {% if pet.especie == 'Passaro' %}selected{% endif %}>Passaro</option>
+                <option value="Hamster" {% if pet.especie == 'Hamster' %}selected{% endif %}>Hamster</option>
+                <option value="Outro" {% if pet.especie == 'Outro' %}selected{% endif %}>Outro</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="raca" class="form-label">Raca</label>
+              <input type="text" class="form-control" id="raca" name="raca"
+                     value="{{ pet.raca }}" maxlength="100" />
+            </div>
+
+            <div class="col-md-3">
+              <label for="idade" class="form-label">Idade (anos)</label>
+              <input type="number" class="form-control" id="idade" name="idade"
+                     value="{{ pet.idade }}" min="0" max="30" />
+            </div>
+
+            <div class="col-md-3">
+              <label for="peso" class="form-label">Peso (kg)</label>
+              <input type="text" class="form-control" id="peso" name="peso"
+                     value="{{ pet.peso }}" />
+            </div>
+
+            <div class="col-md-8">
+              <label for="tutor" class="form-label">Nome do tutor <span class="texto-obrigatorio">*</span></label>
+              <input type="text" class="form-control" id="tutor" name="tutor"
+                     value="{{ pet.tutor }}" required maxlength="255" />
+            </div>
+
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-laranja px-4">
+              <i class="bi bi-check-lg me-1"></i>Salvar
+            </button>
+            <a href="{{ url_for('listar_pets') }}" class="btn btn-outline-secondary px-4">
+              <i class="bi bi-x-lg me-1"></i>Cancelar
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

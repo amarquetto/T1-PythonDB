@@ -22,47 +22,37 @@
         <thead class="thead-laranja">
           <tr>
             <th>#</th>
-            <th><i class="bi bi-tag me-1"></i>Nome do Pet</th>
-            <th><i class="bi bi-search me-1"></i>Espécie</th>
-            <th>Raça</th>
-            <th><i class="bi bi-calendar me-1"></i>Idade</th>
-            <th><i class="bi bi-person me-1"></i>Tutor</th>
+            <th>Nome</th>
+            <th>Especie</th>
+            <th>Raca</th>
+            <th>Idade</th>
+            <th>Tutor</th>
             <th>Peso</th>
-            <th class="text-center">Ações</th>
+            <th class="text-center">Acoes</th>
           </tr>
         </thead>
         <tbody>
           {% for p in pets %}
           <tr>
-            <td class="text-muted small">{{ p.id }}</td>
-            <td>
-              <!-- Ícone de acordo com a espécie -->
-              {% if p.especie == 'Cão' %}🐶
-              {% elif p.especie == 'Gato' %}🐱
-              {% elif p.especie == 'Coelho' %}🐰
-              {% else %}🐾{% endif %}
-              <strong>{{ p.nome }}</strong>
-            </td>
-            <td
-              \>
-              <!-- tipo de etiqueta do Bootstrap deixa o nome da espécie em azul claro-->
-              <span class="badge bg-info text-dark">{{ p.especie }}</span>
-            </td
-            \>
-            <!-- Se idade = 1 ano, mostra 1 ano. Senão mostra 2 anos/ 3 anos e assim por diante-->
+            <td class="text-muted small">{{ p.id_pet }}</td>
+            <td><strong>{{ p.nome }}</strong></td>
+            <td><span class="badge bg-info text-dark">{{ p.especie }}</span></td>
             <td>{{ p.raca }}</td>
             <td>{{ p.idade }} ano{% if p.idade != 1 %}s{% endif %}</td>
             <td>{{ p.tutor }}</td>
             <td>{{ p.peso }}</td>
             <td class="text-center">
-              <button class="btn btn-sm btn-outline-primary me-1" title="Editar pet">
+              <a href="{{ url_for('editar_pet', id_pet=p.id_pet) }}"
+                 class="btn btn-sm btn-outline-primary me-1" title="Editar">
                 <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger"
-                      onclick="confirmarExclusao('{{ p.nome }}')"
-                      title="Excluir pet">
-                <i class="bi bi-trash"></i>
-              </button>
+              </a>
+              <form method="POST" action="{{ url_for('excluir_pet', id_pet=p.id_pet) }}"
+                    style="display:inline"
+                    onsubmit="return confirm('Excluir o pet {{ p.nome }}?')">
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
             </td>
           </tr>
           {% endfor %}
