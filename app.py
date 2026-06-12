@@ -38,7 +38,7 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         senha = request.form.get('senha', '').strip()
-        usuario = db.buscar_funcionario_por_email(email)
+        usuario = db.execute_one('SELECT * FROM funcionarios WHERE email = %s', (email,))
         if usuario and usuario['senha'] == senha and usuario['ativo']:
             session['id'] = usuario['id_funcionario']
             session['nome'] = usuario['nome']
@@ -47,6 +47,7 @@ def login():
             return redirect(url_for('listar_pets'))
         flash('E-mail ou senha incorretos.', 'danger')
     return render_template('login.html')
+
 
 @app.route('/logout')
 def logout():
@@ -61,7 +62,7 @@ def logout():
 @login_required
 @admin_required
 def listar_funcoes():
-    funcoes = db.listar_funcoes()
+    funcoes = db.execute_query('SELECT * FROM funcoes ORDER BY nome_funcao', fetch=True)
     return render_template('usuarios/listar_funcoes.html', funcoes=funcoes)
 
 
@@ -77,14 +78,17 @@ def inserir_funcao():
         if not nome:
             flash('Informe o nome da funcao.', 'danger')
         else:
-            db.inserir_funcao(
+            sql = '''INSERT INTO funcoes (nome_funcao, descricao, status, perm_dashboard,
+                     perm_usuarios, perm_funcoes, perm_pets, perm_servicos)
+                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
+            db.execute_query(sql, (
                 nome, descricao, status,
                 'dashboard' in perms,
                 'usuarios' in perms,
                 'funcoes' in perms,
                 'pets' in perms,
                 'servicos' in perms
-            )
+            ))
             flash('Funcao cadastrada com sucesso!', 'success')
             return redirect(url_for('listar_funcoes'))
     return render_template('usuarios/cadastrar_funcoes.html')
@@ -94,7 +98,7 @@ def inserir_funcao():
 @login_required
 @admin_required
 def editar_funcao(id_funcao):
-    funcao = db.buscar_funcao(id_funcao)
+    funcao = db.execute_one('SELECT * FROM funcoes WHERE id_funcao = %s', (id_funcao,))
     if not funcao:
         flash('Funcao nao encontrada.', 'danger')
         return redirect(url_for('listar_funcoes'))
@@ -106,14 +110,18 @@ def editar_funcao(id_funcao):
         if not nome:
             flash('Informe o nome da funcao.', 'danger')
         else:
-            db.atualizar_funcao(
-                id_funcao, nome, descricao, status,
+            sql = '''UPDATE funcoes SET nome_funcao=%s, descricao=%s, status=%s,
+                     perm_dashboard=%s, perm_usuarios=%s, perm_funcoes=%s,
+                     perm_pets=%s, perm_servicos=%s WHERE id_funcao=%s'''
+            db.execute_query(sql, (
+                nome, descricao, status,
                 'dashboard' in perms,
                 'usuarios' in perms,
                 'funcoes' in perms,
                 'pets' in perms,
-                'servicos' in perms
-            )
+                'servicos' in perms,
+                id_funcao
+            ))
             flash('Funcao atualizada!', 'success')
             return redirect(url_for('listar_funcoes'))
     return render_template('usuarios/editar_funcao.html', funcao=funcao)
@@ -123,7 +131,7 @@ def editar_funcao(id_funcao):
 @login_required
 @admin_required
 def excluir_funcao(id_funcao):
-    db.excluir_funcao(id_funcao)
+    db.execute_query('DELETE FROM funcoes WHERE id_funcao = %s', (id_funcao,))
     flash('Funcao excluida.', 'success')
     return redirect(url_for('listar_funcoes'))
 
@@ -134,15 +142,15 @@ def excluir_funcao(id_funcao):
 @login_required
 @admin_required
 def listar_usuarios():
-    usuarios = db.listar_funcionarios()
+    sql = 'SELECT id_funcionario, nome, email, tipo, ativo FROM funcionarios ORDER BY nome'
+    usuarios = db.execute_query(sql, fetch=True)
     return render_template('usuarios/listar_usuarios.html', usuarios=usuarios)
-
 
 @app.route('/usuarios/inserir', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def inserir_usuario():
-    funcoes = db.listar_funcoes()
+    funcoes = db.execute_query('SELECT * FROM funcoes ORDER BY nome_funcao', fetch=True)
     if request.method == 'POST':
         nome = request.form.get('nome', '').strip()
         email = request.form.get('email', '').strip()
@@ -152,7 +160,9 @@ def inserir_usuario():
         if not nome or not email or not senha:
             flash('Preencha todos os campos obrigatorios.', 'danger')
         else:
-            db.inserir_funcionario(nome, email, senha, tipo, id_funcao)
+            sql = '''INSERT INTO funcionarios (nome, email, senha, tipo, id_funcao)
+                     VALUES (%s, %s, %s, %s, %s)'''
+            db.execute_query(sql, (nome, email, senha, tipo, id_funcao))
             flash(f'Funcionario "{nome}" cadastrado!', 'success')
             return redirect(url_for('listar_usuarios'))
     return render_template('usuarios/inserir_usuario.html', funcoes=funcoes)
@@ -162,8 +172,8 @@ def inserir_usuario():
 @login_required
 @admin_required
 def editar_usuario(id_funcionario):
-    usuario = db.buscar_funcionario(id_funcionario)
-    funcoes = db.listar_funcoes()
+    usuario = db.execute_one('SELECT * FROM funcionarios WHERE id_funcionario = %s', (id_funcionario,))
+    funcoes = db.execute_query('SELECT * FROM funcoes ORDER BY nome_funcao', fetch=True)
     if not usuario:
         flash('Funcionario nao encontrado.', 'danger')
         return redirect(url_for('listar_usuarios'))
@@ -177,9 +187,14 @@ def editar_usuario(id_funcionario):
         if not nome or not email:
             flash('Preencha todos os campos.', 'danger')
         else:
-            db.atualizar_funcionario(id_funcionario, nome, email, tipo, id_funcao, ativo)
+            sql = '''UPDATE funcionarios SET nome=%s, email=%s, tipo=%s,
+                     id_funcao=%s, ativo=%s WHERE id_funcionario=%s'''
+            db.execute_query(sql, (nome, email, tipo, id_funcao, ativo, id_funcionario))
             if nova_senha:
-                db.atualizar_senha_funcionario(id_funcionario, nova_senha)
+                db.execute_query(
+                    'UPDATE funcionarios SET senha=%s WHERE id_funcionario=%s',
+                    (nova_senha, id_funcionario)
+                )
             flash('Funcionario atualizado!', 'success')
             return redirect(url_for('listar_usuarios'))
     return render_template('usuarios/editar_usuario.html', usuario=usuario, funcoes=funcoes)
@@ -192,7 +207,7 @@ def excluir_usuario(id_funcionario):
     if id_funcionario == session.get('id'):
         flash('Voce nao pode excluir sua propria conta.', 'danger')
     else:
-        db.excluir_funcionario(id_funcionario)
+        db.execute_query('DELETE FROM funcionarios WHERE id_funcionario = %s', (id_funcionario,))
         flash('Funcionario excluido.', 'success')
     return redirect(url_for('listar_usuarios'))
 
@@ -202,7 +217,7 @@ def excluir_usuario(id_funcionario):
 @app.route('/pets/listar')
 @login_required
 def listar_pets():
-    pets = db.listar_pets()
+    pets = db.execute_query('SELECT * FROM pets ORDER BY nome', fetch=True)
     return render_template('pets/listar_pets.html', pets=pets)
 
 
@@ -223,7 +238,9 @@ def inserir_pet():
                 idade = int(idade)
             except ValueError:
                 idade = 0
-            db.inserir_pet(nome, especie, raca, tutor, idade, peso)
+            sql = '''INSERT INTO pets (nome, especie, raca, tutor, idade, peso)
+                     VALUES (%s, %s, %s, %s, %s, %s)'''
+            db.execute_query(sql, (nome, especie, raca, tutor, idade, peso))
             flash(f'Pet "{nome}" cadastrado!', 'success')
             return redirect(url_for('listar_pets'))
     return render_template('pets/inserir_pet.html')
@@ -232,7 +249,7 @@ def inserir_pet():
 @app.route('/pets/editar/<int:id_pet>', methods=['GET', 'POST'])
 @login_required
 def editar_pet(id_pet):
-    pet = db.buscar_pet(id_pet)
+    pet = db.execute_one('SELECT * FROM pets WHERE id_pet = %s', (id_pet,))
     if not pet:
         flash('Pet nao encontrado.', 'danger')
         return redirect(url_for('listar_pets'))
@@ -250,7 +267,9 @@ def editar_pet(id_pet):
                 idade = int(idade)
             except ValueError:
                 idade = 0
-            db.atualizar_pet(id_pet, nome, especie, raca, tutor, idade, peso)
+            sql = '''UPDATE pets SET nome=%s, especie=%s, raca=%s, tutor=%s,
+                     idade=%s, peso=%s WHERE id_pet=%s'''
+            db.execute_query(sql, (nome, especie, raca, tutor, idade, peso, id_pet))
             flash(f'Pet "{nome}" atualizado!', 'success')
             return redirect(url_for('listar_pets'))
     return render_template('pets/editar_pet.html', pet=pet)
@@ -259,7 +278,7 @@ def editar_pet(id_pet):
 @app.route('/pets/excluir/<int:id_pet>', methods=['POST'])
 @login_required
 def excluir_pet(id_pet):
-    db.excluir_pet(id_pet)
+    db.execute_query('DELETE FROM pets WHERE id_pet = %s', (id_pet,))
     flash('Pet excluido.', 'success')
     return redirect(url_for('listar_pets'))
 
@@ -269,7 +288,7 @@ def excluir_pet(id_pet):
 @app.route('/servicos/listar')
 @login_required
 def listar_servicos():
-    servicos = db.listar_servicos()
+    servicos = db.execute_query('SELECT * FROM servicos ORDER BY nome', fetch=True)
     return render_template('servicos/listar_servicos.html', servicos=servicos)
 
 
@@ -289,7 +308,9 @@ def inserir_servico():
                 preco = float(preco.replace(',', '.'))
             except ValueError:
                 preco = 0.0
-            db.inserir_servico(nome, categoria, preco, duracao, disponivel)
+            sql = '''INSERT INTO servicos (nome, categoria, preco, duracao, disponivel)
+                     VALUES (%s, %s, %s, %s, %s)'''
+            db.execute_query(sql, (nome, categoria, preco, duracao, disponivel))
             flash(f'Servico "{nome}" cadastrado!', 'success')
             return redirect(url_for('listar_servicos'))
     return render_template('servicos/inserir_servico.html')
@@ -298,7 +319,7 @@ def inserir_servico():
 @app.route('/servicos/editar/<int:id_servico>', methods=['GET', 'POST'])
 @login_required
 def editar_servico(id_servico):
-    servico = db.buscar_servico(id_servico)
+    servico = db.execute_one('SELECT * FROM servicos WHERE id_servico = %s', (id_servico,))
     if not servico:
         flash('Servico nao encontrado.', 'danger')
         return redirect(url_for('listar_servicos'))
@@ -315,7 +336,9 @@ def editar_servico(id_servico):
                 preco = float(preco.replace(',', '.'))
             except ValueError:
                 preco = 0.0
-            db.atualizar_servico(id_servico, nome, categoria, preco, duracao, disponivel)
+            sql = '''UPDATE servicos SET nome=%s, categoria=%s, preco=%s,
+                     duracao=%s, disponivel=%s WHERE id_servico=%s'''
+            db.execute_query(sql, (nome, categoria, preco, duracao, disponivel, id_servico))
             flash(f'Servico "{nome}" atualizado!', 'success')
             return redirect(url_for('listar_servicos'))
     return render_template('servicos/editar_servico.html', servico=servico)
@@ -324,7 +347,7 @@ def editar_servico(id_servico):
 @app.route('/servicos/excluir/<int:id_servico>', methods=['POST'])
 @login_required
 def excluir_servico(id_servico):
-    db.excluir_servico(id_servico)
+    db.execute_query('DELETE FROM servicos WHERE id_servico = %s', (id_servico,))
     flash('Servico excluido.', 'success')
     return redirect(url_for('listar_servicos'))
 
